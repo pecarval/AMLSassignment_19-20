@@ -1,18 +1,25 @@
-from A1 import A1
+from A1.A1 import A1
 from Datasets import data_preprocessing
+
+
+import pandas as pd
+import numpy as np
 
 # ======================================================================================================================
 # Data preprocessing
 #data_train, data_val, data_test = data_preprocessing.split_dataset()
 
-images = data_preprocessing.main()
+gray_train, gray_test, gray_val, lbs_train, lbs_test, lbs_val = data_preprocessing.mainA1()
+
 
 # ======================================================================================================================
 # Task A1
 model_A1 = A1()                 # Build model object.
-acc_A1_train = model_A1.train(data_train) # Train model based on the training set (you should fine-tune your model based on validation set.)
-#acc_A1_test = model_A1.test(args...)   # Test model based on the test set.
+acc_A1_train = model_A1.train(gray_train, lbs_train) # Train model based on the training set (you should fine-tune your model based on validation set.)
+acc_A1_test = model_A1.test(gray_test, lbs_test)   # Test model based on the test set.
 
+print("Traing and Testing finished!")
+print('TA1:{},{}'.format(acc_A1_train, acc_A1_test))
 #Clean up memory/GPU etc...             # Some code to free memory if necessary.
 
 pass
