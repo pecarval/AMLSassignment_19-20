@@ -7,190 +7,65 @@ Created on Wed Nov 20 19:25:58 2019
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA, FastICA
+from sklearn.preprocessing import StandardScaler
 from PIL import Image
 import glob, os
 import matplotlib.pyplot as plt 
 from os import listdir
 from matplotlib import image
 import numpy as np
-import cv2
+#import cv2
 import time
-import torch
-from torchvision import transforms, utils, datasets, models
-from torch.utils.data import Dataset, DataLoader
+#import torch
+#from torchvision import transforms, utils, datasets, models
+#from torch.utils.data import Dataset, DataLoader
+import Datasets.dataset.lab2_landmarks as import_data
 
 def mainA1():
-    # Previous extraction method
-    '''
-    images = process_images()
-    gray_train = color_to_gray(images['train'])
-    gray_test = color_to_gray(images['test'])
-    lbs_train, lbs_test = process_labelsA1()
-    '''
+    tr_data, tr_lbs, te_data, te_lbs = landmark_computation()
+    data_train = tr_data.reshape(tr_data.shape[0], tr_data.shape[1]*tr_data.shape[2])
+    data_test = te_data.reshape(te_data.shape[0], te_data.shape[1]*te_data.shape[2])
+    
+    pca_train, pca_test = dimensionality_reduction(data_train, data_test)
+    return pca_train, pca_test, tr_lbs, te_lbs
 
-    images = image_processing()
-    gray_train = reshape_images(images['train'])
-    gray_test = reshape_images(images['test'])
-    lbs_train, lbs_test = process_labelsA1()
+def landmark_computation():
+    imgs, lbs = import_data.extract_features_labels()
+    tr_data, te_data, tr_lbs, te_lbs = train_test_split(imgs, lbs, test_size=0.2)
+    return tr_data, tr_lbs, te_data, te_lbs
 
+def dimensionality_reduction(train_dataset, test_dataset):
     '''
-    gray_imgs_train = color_to_gray2(images['train'])
-    gray_imgs_test = color_to_gray2(images['test'])
-    diff_train = pixels_differences(gray_imgs_train)
-    diff_test = pixels_differences(gray_imgs_test)
-
-    return diff_train, diff_test, lbs_train, lbs_test
+    Scales the data and performs Principal Component 
+    Analysis (PCA) on a given dataset
     '''
 
-    #pca_train, pca_test = perform_pca(gray_train, gray_test)
-    #print('TRAIN Original shape: ', gray_train.shape, 'and PCA shape: ', pca_train.shape)
-    #print('TEST Original shape: ', gray_test.shape, 'and PCA shape: ', pca_test.shape)
-
-    #return pca_train, pca_test, lbs_train, lbs_test
-    return gray_train, gray_test, lbs_train, lbs_test
-
-def image_processing():
-    '''
-    Load all images of a directory into 3 datasets: train, test and val
-    '''
-
-    dirA1 = '/Datasets/dataset/A1/Train Test Split/'
-    phases = ['train','test']
-    datasets = dict()
-
-    # Iterating over Train/Test/Val
-    for folder in phases:
-        curFolder = os.getcwd() + dirA1 + folder + '/'
-
-        datasets[str(folder)] = []
-
-        # Iterating over images in a sorted order
-        for filename in sorted(os.listdir(curFolder), key = lambda x : int(x[:-4])):
-
-            img = np.array(Image.open(curFolder + filename).convert('L'))
-            datasets[str(folder)].append(img)
-
-    return datasets
-
-def reshape_images(images):
-
-    numPixels = images[0].shape[0]*images[0].shape[1]
-    dataset = np.zeros(shape=(len(images),numPixels))
-
-    for i, image in enumerate(images):
-        dataset[i,:] = image.reshape(1,-1)
-
-    return dataset
-
-
-def process_images():
-    '''
-    Load all images of a directory into 3 datasets: train, test and val
-    '''
-
-    dirA1 = '/Datasets/dataset/A1/Train Test Split/'
-    #phases = ['train','test','val']
-    phases = ['train','test']
-    datasets = dict()
-
-    # Iterating over Train/Test/Val
-    for folder in phases:
-        curFolder = os.getcwd() + dirA1 + folder + '/'
-
-        datasets[str(folder)] = []
-
-        # Iterating over images in a sorted order
-        for filename in sorted(os.listdir(curFolder), key = lambda x : int(x[:-4])):
-
-            # Load image as numpy array
-            # Shape: (218, 178, 3)
-            img_data = image.imread(curFolder + filename)
-            datasets[str(folder)].append(img_data)
-
-    return datasets
-
-
-def color_to_gray(images):
-    '''
-    Converts image to grayscale
-    '''
-
-    num_pixels = images[0].shape[0]*images[1].shape[1]
-    grey_imgs = np.zeros(shape=(len(images),num_pixels))
-
-    for i, image in enumerate(images):
-         # Shape: (218, 178)
-         # Since gray image only has 1 channel
-        grey_img = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        grey_imgs[i,:] = np.array(grey_img).reshape(1,num_pixels)
-
-    return grey_imgs
-
-def process_labelsA1():
-    '''
-    Processes and orders labels for task A1
-    '''
-
-    curDir = os.getcwd() + '/Datasets/dataset/Labels for Train Test/'
-
-    df_train = pd.read_csv(curDir + 'trainlabelsA.csv', index_col=0)
-    df_train.sort_index()
-    lbs_train = df_train['gender'].to_numpy().reshape(-1,)
-
-    df_test= pd.read_csv(curDir + 'testlabelsA.csv', index_col=0)
-    df_test.sort_index()
-    lbs_test = df_test['gender'].to_numpy().reshape(-1,)
-
-    #df_val = pd.read_csv(curDir + 'vallabelsA.csv', index_col=0)
-    #df_val.sort_index()
-    #lbs_val = df_val['gender'].to_numpy().reshape(-1,)
-
-    #return lbs_train, lbs_test, lbs_val
-    return lbs_train, lbs_test
-
-def perform_pca(train_dataset, test_dataset):
-    '''
-    Performs Principal Component Analysis (PCA) on 
-    a given dataset
-    '''
-
-    print("PCA started!")
+    print("Dimensionality reduction started!")
     time0 = time.time()
+
+    scaler = StandardScaler()
+    scaler.fit(train_dataset)
+    train_dataset = scaler.transform(train_dataset)
+    test_dataset = scaler.transform(test_dataset)
 
     pca = PCA(n_components = 'mle', svd_solver = 'full')
 
-    train_pca = pca.fit_transform(train_dataset)
-    test_pca = pca.fit_transform(test_dataset)
+    pca.fit(train_dataset)
+    train_dataset = pca.transform(train_dataset)
+    test_dataset = pca.transform(test_dataset)
 
     time1 = time.time()
     print("PCA finished, it took: ", (time1-time0)/60, " min")
 
-    return train_pca, test_pca
+    return train_dataset, test_dataset
 
-
-def pixels_differences(images):
-    '''
-    Computes the difference between each pixel in an image
-    and the other pixels in that same image, thus building a feature
-    '''
-
-    numPixels = images[0].shape[0]*images[0].shape[1]
-    feature = np.zeros(shape=(len(images), numPixels))
-    mask = np.arange(numPixels) != np.arange(numPixels)[:,None]
-
-    for i, image in enumerate(images):
-        ret = image.ravel()
-        ret = ret[:,None] - ret
-        feature[i,:] = ret[np.where(mask)]
-
-    return feature
-
+'''
 def mainA2():
-    '''
-    Loads data into dataloaders for model training, validation and
+    
+    #Loads data into dataloaders for model training, validation and
     testing of task A2, performing data augmentation on training
     data and pre-processing all data (normalization and re-sizing)
-    '''
+    
 
     # Data normalization for training
     data_transforms = {
@@ -226,3 +101,127 @@ def mainA2():
     test_dataloader = torch.utils.data.DataLoader(test_datasets, batch_size=64, shuffle=True, num_workers=4)
 
     return dataloaders, test_dataloader, dataset_sizes
+'''
+
+
+'''
+DELETED CODE
+--
+Might need until the end of the project
+
+def pixels_differences(images):
+    ''''''
+    Computes the difference between each pixel in an image
+    and the other pixels in that same image, thus building a feature
+    ''''''
+
+    numPixels = images[0].shape[0]*images[0].shape[1]
+    feature = np.zeros(shape=(len(images), numPixels))
+    mask = np.arange(numPixels) != np.arange(numPixels)[:,None]
+
+    for i, image in enumerate(images):
+        ret = image.ravel()
+        ret = ret[:,None] - ret
+        feature[i,:] = ret[np.where(mask)]
+
+    return feature
+
+def process_labelsA1():
+    ''''''
+    Processes and orders labels for task A1
+    ''''''
+
+    curDir = os.getcwd() + '/Datasets/dataset/Labels for Train Test/'
+
+    df_train = pd.read_csv(curDir + 'trainlabelsA.csv', index_col=0)
+    df_train.sort_index()
+    lbs_train = df_train['gender'].to_numpy().reshape(-1,)
+
+    df_test= pd.read_csv(curDir + 'testlabelsA.csv', index_col=0)
+    df_test.sort_index()
+    lbs_test = df_test['gender'].to_numpy().reshape(-1,)
+
+    #df_val = pd.read_csv(curDir + 'vallabelsA.csv', index_col=0)
+    #df_val.sort_index()
+    #lbs_val = df_val['gender'].to_numpy().reshape(-1,)
+
+    #return lbs_train, lbs_test, lbs_val
+    return lbs_train, lbs_test
+
+def color_to_gray(images):
+    ''''''
+    Converts image to grayscale
+    ''''''
+
+    num_pixels = images[0].shape[0]*images[1].shape[1]
+    grey_imgs = np.zeros(shape=(len(images),num_pixels))
+
+    for i, image in enumerate(images):
+         # Shape: (218, 178)
+         # Since gray image only has 1 channel
+        grey_img = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        grey_imgs[i,:] = np.array(grey_img).reshape(1,num_pixels)
+
+    return grey_imgs
+
+def image_processing():
+    ''''''
+    Load all images of a directory into 3 datasets: train, test and val
+    ''''''
+
+    dirA1 = '/Datasets/dataset/A1/Train Test Split/'
+    phases = ['train','test']
+    datasets = dict()
+
+    # Iterating over Train/Test/Val
+    for folder in phases:
+        curFolder = os.getcwd() + dirA1 + folder + '/'
+
+        datasets[str(folder)] = []
+
+        # Iterating over images in a sorted order
+        for filename in sorted(os.listdir(curFolder), key = lambda x : int(x[:-4])):
+
+            img = np.array(Image.open(curFolder + filename).convert('L'))
+            datasets[str(folder)].append(img)
+
+    return datasets
+
+def reshape_images(images):
+
+    numPixels = images[0].shape[0]*images[0].shape[1]
+    dataset = np.zeros(shape=(len(images),numPixels))
+
+    for i, image in enumerate(images):
+        dataset[i,:] = image.reshape(1,-1)
+
+    return dataset
+
+
+def process_images():
+    ''''''
+    Load all images of a directory into 3 datasets: train, test and val
+    ''''''
+
+    dirA1 = '/Datasets/dataset/A1/Train Test Split/'
+    #phases = ['train','test','val']
+    phases = ['train','test']
+    datasets = dict()
+
+    # Iterating over Train/Test/Val
+    for folder in phases:
+        curFolder = os.getcwd() + dirA1 + folder + '/'
+
+        datasets[str(folder)] = []
+
+        # Iterating over images in a sorted order
+        for filename in sorted(os.listdir(curFolder), key = lambda x : int(x[:-4])):
+
+            # Load image as numpy array
+            # Shape: (218, 178, 3)
+            img_data = image.imread(curFolder + filename)
+            datasets[str(folder)].append(img_data)
+
+    return datasets
+
+'''
