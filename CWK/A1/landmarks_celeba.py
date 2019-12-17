@@ -108,6 +108,7 @@ def extract_features_labels():
         all_features = []
         all_labels = []
         for img_path in image_paths:
+            # Split after 2nd here due to directory's double .
             file_name= img_path.split('.')[2].split('/')[-1]
 
             # load image

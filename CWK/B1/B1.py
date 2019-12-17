@@ -1,13 +1,13 @@
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_validate
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
 import numpy as np
 
 import time
 
-class A1:
+class B1:
 
     def __init__(self):
         # Define support vector classifier
@@ -32,7 +32,7 @@ class A1:
         svms = cv_results['estimator']
         self.svm = svms[-1]
         '''
-
+        
         predictions = self.svm.predict(data_train)
         train_accuracy = accuracy_score(lbs_train, predictions) * 100
 
