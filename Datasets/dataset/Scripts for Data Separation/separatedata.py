@@ -4,23 +4,23 @@ import random
 import os
 
 
-source = 'A2/img/'
-dest1 = 'A2/smile/'
-dest2 = 'A2/nosmile/'
-labels = pd.read_csv('A1/labels.csv')
+source = 'Original Datasets/celeba/img/'
+dest1 = 'Original Datasets/celeba/male/'
+dest2 = 'Original Datasets/celeba/female/'
+labels = pd.read_csv('Original Datasets/celeba/labels.csv')
 
 files = os.listdir(source)
 
 for f in files:
     num = int(f[:-4])
-    if (int(labels.loc[num,"smiling"]) == 1):
+    if (int(labels.loc[num,"gender"]) == 1):
        shutil.move(source + f, dest1)
     else:
        shutil.move(source + f, dest2)
 
 
-label1 = 'smile/'
-label2 = 'nosmile/'
+label1 = 'male/'
+label2 = 'female/'
 
 label1dir = dest1
 label2dir = dest2
@@ -28,14 +28,14 @@ label2dir = dest2
 label1files = os.listdir(label1dir)
 label2files = os.listdir(label2dir)
 
-trainLabel1 = 'A2/train/' + label1
-trainLabel2 = 'A2/train/' + label2
+trainLabel1 = 'Original Datasets/celeba/train' + label1
+trainLabel2 = 'Original Datasets/celeba/train/' + label2
 
-testLabel1 = 'A2/test/' + label1
-testLabel2 = 'A2/test/' + label2
+testLabel1 = 'Original Datasets/celeba/test/' + label1
+testLabel2 = 'Original Datasets/celeba/test/' + label2
 
-valLabel1 = 'A2/val/' + label1
-valLabel2 = 'A2/val/' + label2
+valLabel1 = 'Original Datasets/celeba/val/' + label1
+valLabel2 = 'Original Datasets/celeba/val/' + label2
 
 label1files.sort()  # make sure that the filenames have a fixed order before shuffling
 random.seed(230)

@@ -19,16 +19,12 @@ random.seed(230)
 random.shuffle(source_files) # shuffles the ordering of filenames (deterministic given the chosen seed)
 
 
-#split1_1 = int(0.64 * len(source_files))
-split1_1 = int(0.8 * len(source_files))
-#split1_2 = int(0.8 * len(source_files))
+split1_1 = int(0.7 * len(source_files))
+split1_2 = int(0.8 * len(source_files))
 train_filenames = source_files[:split1_1]
-#val_filenames = source_files[split1_1:split1_2]
-test_filenames = source_files[split1_1:]
+val_filenames = source_files[split1_1:split1_2]
+test_filenames = source_files[split1_2:]
 
-train_csv = 'A1_trainlabels.csv'
-test_csv = 'A1_testlabels.csv'
-#val_csv = 'A1_vallabels.csv'
 
 for f in train_filenames:
    shutil.move(source + f, train)

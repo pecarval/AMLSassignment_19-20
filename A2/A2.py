@@ -37,7 +37,6 @@ class A2:
 
         # Decay LR by a factor of 0.1 every 7 epochs
         exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=10, gamma=0.1)
-        num_workers = 0
         self.model, acc = self.train_model(train_dl, sizes, optimizer_ft, exp_lr_scheduler, num_epochs=25)
         return acc
 
@@ -116,7 +115,7 @@ class A2:
         # Load best model weights as the model
         # Best model weights assumed to be the ones with highest validation accuracy
         self.model.load_state_dict(best_model_wts)
-        return self.model, best_acc * 100
+        return self.model, best_acc * 100.
 
 
     def test(self, test_dl):
