@@ -15,13 +15,11 @@ import matplotlib.pyplot as plt
 from os import listdir
 from matplotlib import image
 import numpy as np
-#import cv2
 import time
-#import torch
-#from torchvision import transforms, utils, datasets, models
-#from torch.utils.data import Dataset, DataLoader
+import torch
+from torchvision import transforms, utils, datasets, models
+from torch.utils.data import Dataset, DataLoader
 import Datasets.dataset.landmarks_celeba as landmarks_celeba
-import Datasets.dataset.landmarks_cartoon as landmarks_cartoon
 
 
 def mainB1():
@@ -72,3 +70,44 @@ def landmarksB1():
     tr_data, te_data, tr_lbs, te_lbs = train_test_split(imgs, lbs, test_size=0.2)
     return tr_data, tr_lbs, te_data, te_lbs
 
+def mainB1CNN():
+    '''
+    Loads data into dataloaders for model training, validation and
+    testing of task B1, performing data augmentation on training
+    data and pre-processing all data (normalization and re-sizing)
+    '''
+    
+
+    # Data normalization for training
+    data_transforms = {
+        'train': transforms.Compose([
+            transforms.CenterCrop(178),
+            transforms.RandomApply([transforms.RandomHorizontalFlip(),transforms.RandomVerticalFlip()], p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+        ]),
+        'val': transforms.Compose([
+            transforms.CenterCrop(178),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+        ]),
+        'test': transforms.Compose([
+            transforms.CenterCrop(178),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+        ])
+    }
+
+    data_dir = 'dataset/B1/CNN/'
+    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
+                                            data_transforms[x])
+                    for x in ['train', 'val']}
+    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=64,
+                                                shuffle=True, num_workers=4)
+                for x in ['train', 'val']}
+    dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
+
+    test_datasets = datasets.ImageFolder(os.path.join(data_dir, 'test'),data_transforms['test'])
+    test_dataloader = torch.utils.data.DataLoader(test_datasets, batch_size=64, shuffle=True, num_workers=4)
+
+    return dataloaders, test_dataloader, dataset_sizes
