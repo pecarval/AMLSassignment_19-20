@@ -1,7 +1,9 @@
-from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
-from sklearn.model_selection import cross_validate
-from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_validate, GridSearchCV
+import sys
+sys.path.append('./Datasets/')
+from plot_curve import plot_learning_curve
 
 import numpy as np
 
@@ -40,6 +42,8 @@ class A1:
         print("Time taken for training:  %.2f s" % round(t1-t0,2))
         print("Train Accuracy: %.2f " % round(train_accuracy,2))
         
+        plot_learning_curve(SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42),"Learning Curve for A1 Task", data_train, lbs_train)
+
         return round(train_accuracy,2)
 
 
