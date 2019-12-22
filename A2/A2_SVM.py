@@ -1,68 +1,78 @@
-from sklearn.metrics import accuracy_score
-from sklearn.svm import SVC
-from sklearn.model_selection import cross_validate, GridSearchCV
-import sys
-sys.path.append('./Datasets/')
-from plot_curve import plot_learning_curve
-
+import sys,os
 import numpy as np
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_validate
 
-import time
+sys.path.append('../Datasets/')
+import plot_learning_curve
+
 
 class A2:
+    '''
+    Class responsible for initializing, training and testing the SVM model
+    with facial landmarks as features.
+    '''
 
     def __init__(self):
-        # Define support vector classifier
-        self.svm = SVC(C=10, kernel='rbf', gamma=0.001, probability=True, random_state=42)
+        '''
+        Initializes the SVM to be used in this task, with
+        parameters found in Grid Search CV (file: hyperparametersA2model1.ipynb)
+        '''
+
+        # Best parameters for Facial landmarks model 
+        self.svm = SVC(C=1, kernel='rbf', gamma='scale', probability=True, random_state=42)
+
 
     def train(self, data_train, lbs_train):
         '''
-        Method to train the model using training data, as well as
-        fine-tuning the model using Cross-Validation
-        '''
+        Trains the model using training data, using a previously
+        defined SVM (in init function)
 
-        t0 = time.time()
+        Keyword arguments:
+            - data_train : Training dataset
+            - lbs_train : Labels for training dataset
+
+        Returns:
+            - train_accuracy : Training accuracy of model in %
+        '''
 
         # Fitting model
         self.svm.fit(data_train, lbs_train)
 
+        ## To perform Cross-Validation : Uncomment this block
         '''
-        ## Perform Cross-Validation
-        cv_results = cross_validate(self.svm, data_train, lbs_train, cv=3, return_estimator=True)
+        cv_results = cross_validate(SVC(C=10, kernel='rbf', gamma=0.001, probability=True, random_state=42), data_train, lbs_train, cv=3, return_estimator=True)
         accuracies = cv_results['test_score']
         print("Mean Validation Accuracy: %0.2f (+/- %0.2f)" % (accuracies.mean(), accuracies.std() * 2))
-        svms = cv_results['estimator']
-        self.svm = svms[-1]
         '''
 
+        # Computing training accuracy
         predictions = self.svm.predict(data_train)
         train_accuracy = accuracy_score(lbs_train, predictions) * 100
 
-        t1 = time.time()
-        print("Time taken for training:  %.2f s" % round(t1-t0,2))
-        print("Train Accuracy: %.2f " % round(train_accuracy,2))
+        # Obtain learning curve (Saves it in main directory)
+        plot_learning_curve(SVC(C=1, kernel='rbf', gamma='scale', probability=True, random_state=42),"Learning Curve for A1 Task (SVM with facial landmarks)", data_train, lbs_train,cv=5)
 
-        plot_learning_curve(SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42),"Learning Curve for A2 Task", data_train, lbs_train)
-        
         return round(train_accuracy,2)
 
 
     def test(self, data_test, lbs_test):
         '''
-        Method to test the built model using testing data
-        '''
+        Tests the built model using previously unseen testing data
 
-        t0 = time.time()
-        print("\nTesting started!")
+        Keyword arguments:
+            - data_test : Testing dataset
+            - lbs_test : Labels for testing dataset
+
+        Returns:
+            - test_accuracy : Testing accuracy of model in %
+        '''
 
         # Obtaining predicted labels from testing
         pred_test = self.svm.predict(data_test)
 
         # Calculate accuracy
         test_accuracy = accuracy_score(lbs_test, pred_test) * 100
-
-        t1 = time.time()
-        print("Time taken for testing:  %.2f s" % round(t1-t0,2))
-        print("Test Accuracy: %.2f " % round(test_accuracy,2))
 
         return round(test_accuracy,2)

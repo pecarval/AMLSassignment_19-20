@@ -1,51 +1,78 @@
-from __future__ import print_function, division
-import torchvision.models as models
-import torch.nn as nn
-import os
-import torch
+import os, time, copy, sys
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
+
+import torch
 import torchvision
+import torch.nn as nn
+from torch.optim import lr_scheduler, SGD
+from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils, datasets, models
-import torch.optim as optim
-from torch.optim import lr_scheduler
-import time
-import copy
-plt.ion()   # interactive mode
+
+sys.path.append('../Datasets/')
+from learning_curve_CNN import plot_acc_curve, plot_loss_curve
 
 
 class A2:
 
     def __init__(self):
-        # Current Approach: Transfer Learning using pre-trained VGG network
+        '''
+        Imports the pre-trained VGG network to be used in this task
+        Makes changes to its fully-connected layer so that it can only return 2 classes
+        '''
 
+        # Define hyperparameters to be used
+        LEARNING_RATE = 0.002
+        STEP_SIZE = 10
+        DECAYING_FACTOR = 0.1
+
+        # Importing & Changing pre-trained VGG model
         self.model = models.vgg16(pretrained=True)
-        # Replace default classifier with new classifier
         classifier_input = self.model.classifier[6].in_features
         self.model.classifier[6] = nn.Linear(classifier_input, 2)
+
+        # Defining loss function as Cross Entropy Loss
         self.criterion = nn.CrossEntropyLoss()
+
+        # Defining Optimizer as Stochastic Gradient Descent (SGD)
+        self.optimizer = SGD(self.model.parameters(), lr=LEARNING_RATE, momentum=0.9)
+
+        # Defining a Step Scheduler of the LR
+        self.scheduler = lr_scheduler.StepLR(self.optimizer, step_size=STEP_SIZE, gamma=DECAYING_FACTOR)
 
         if torch.cuda.is_available():
             self.model.cuda()
 
-    def train(self, train_dl, sizes):
 
-        # Observe that all parameters are being optimized
-        optimizer_ft = optim.SGD(self.model.parameters(), lr=0.002, momentum=0.9)
+    def train(self, dataloader, sizes, num_epochs=25):
+        '''
+        Trains the CNN model for a number of epochs
+        Loads the final model as being the one with the highest validation accuracy
+        Plots 2 learning curves showing the evolution of accuracy
+        and loss at each epoch of training
 
-        # Decay LR by a factor of 0.1 every 7 epochs
-        exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=10, gamma=0.1)
-        self.model, acc = self.train_model(train_dl, sizes, optimizer_ft, exp_lr_scheduler, num_epochs=25)
-        return acc
+        Keyword arguments:
+            - dataloader : torch DataLoader with train, val and test datasets
+            - sizes : Array of 2 elements with size of train and val datasets
 
-    def train_model(self, train_dl, sizes, optimizer, scheduler, num_epochs=25):
-        since = time.time()
+        Returns:
+            - best_train_acc : Training ccuracy of the best epoch in %
+        '''
 
         best_model_wts = copy.deepcopy(self.model.state_dict())
         best_acc = 0.0
-        best_epoch = -1
+        prev_acc = 0.0
+
+        # Initializing arrays to keep track of loss 
+        # and accuracy at each epoch
+        losses = dict()
+        losses['train'] = np.ones(num_epochs)
+        losses['val'] = np.ones(num_epochs)
+        accs = dict()
+        accs['train'] = np.ones(num_epochs)
+        accs['val'] = np.ones(num_epochs)
 
         train_on_gpu = torch.cuda.is_available()
         if train_on_gpu:
@@ -53,72 +80,79 @@ class A2:
             self.model.cuda()
 
         for epoch in range(num_epochs):
-            print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-            print('-' * 10)
 
-            # Each epoch has a training and validation phase
             for phase in ['train', 'val']:
                 if phase == 'train':
-                    self.model.train()  # Set model to training mode
+                    self.model.train()
                 else:
-                    self.model.eval()   # Set model to evaluate mode
+                    self.model.eval()
 
                 running_loss = 0.0
                 running_corrects = 0
 
                 # Iterate over data.
-                for inputs, labels in train_dl[phase]:
+                for inputs, labels in dataloader[phase]:
                     if train_on_gpu:
                         inputs, labels = inputs.cuda(), labels.cuda()
 
-                    # zero the parameter gradients
-                    optimizer.zero_grad()
+                    # Zero parameter gradients
+                    self.optimizer.zero_grad()
 
-                    # forward
-                    # track history if only in train
+                    # Forward propagation
                     with torch.set_grad_enabled(phase == 'train'):
                         outputs = self.model(inputs)
                         _, preds = torch.max(outputs, 1)
                         loss = self.criterion(outputs, labels)
 
-                        # backward + optimize only if in training phase
+                        # Implementing backward propagation + Optimization
+                        # if in train phase
                         if phase == 'train':
                             loss.backward()
-                            optimizer.step()
+                            self.optimizer.step()
 
-                    # statistics
+                    # Computing statistics
                     running_loss += loss.item() * inputs.size(0)
                     running_corrects += torch.sum(preds == labels.data)
+
                 if phase == 'train':
-                    scheduler.step()
+                    self.scheduler.step()
 
+                # Computing loss and accuracy at the epoch
                 epoch_loss = running_loss / sizes[phase]
+                losses[phase][epoch] = epoch_loss
                 epoch_acc = running_corrects.double() / sizes[phase]
+                accs[phase][epoch] = epoch_acc
 
-                print('{} Loss: {:.4f} Acc: {:.4f}'.format(
-                    phase, epoch_loss, epoch_acc))
+                if phase == 'train':
+                    prev_acc = epoch_acc
 
-                # deep copy the model
+                # Save the best mmodel so far
                 if phase == 'val' and epoch_acc > best_acc:
+                    best_train_acc = prev_acc
                     best_acc = epoch_acc
                     best_model_wts = copy.deepcopy(self.model.state_dict())
-                    best_epoch = epoch
-
-            print()
-
-        time_elapsed = time.time() - since
-        print('Training complete in {:.0f}m {:.0f}s'.format(
-            time_elapsed // 60, time_elapsed % 60))
-        print('Best val Acc: {:4f}'.format(best_acc))
-        print('Best epoch: {:4f}'.format(best_epoch))
 
         # Load best model weights as the model
         # Best model weights assumed to be the ones with highest validation accuracy
         self.model.load_state_dict(best_model_wts)
-        return self.model, best_acc * 100.
+
+        # Plotting learning curves
+        plot_loss_curve(losses, num_epochs, 'Train and Validation Losses in Task A2 (Pre-trained VGG)')
+        plot_acc_curve(accs, num_epochs, 'Train and Validation Accuracies in Task A2 (Pre-trained VGG)')
+
+        return round(best_train_acc * 100.,2)
 
 
-    def test(self, test_dl):
+    def test(self, dataloader):
+        '''
+        Test the CNN model on previously unseen data
+
+        Keyword arguments:
+            - dataloader : torch DataLoader with train, val and test datasets
+
+        Returns:
+            - test_acc : Testing accuracy of the model in %
+        '''
 
         test_loss = 0.
         correct = 0.
@@ -126,12 +160,11 @@ class A2:
 
         train_on_gpu = torch.cuda.is_available()
         if train_on_gpu:
-            print('using gpu')
             self.model.cuda()
 
-        for batch_idx, (data, target) in enumerate(test_dl):
+        for batch_idx, (data, target) in enumerate(dataloader['test']):
 
-                # move to GPU
+                # Move to GPU
                 if train_on_gpu:
                     data, target = data.cuda(), target.cuda()
 
@@ -150,9 +183,6 @@ class A2:
                 # Compare predictions to true label
                 correct += np.sum(np.squeeze(pred.eq(target.data.view_as(pred))).cpu().numpy())
                 total += data.size(0)
-                
-        print('Test Loss: {:.6f}\n'.format(test_loss))
 
-        test_accuracy = 100. * correct / total
-        print('\nTest Accuracy: %2d%% (%2d/%2d)' % (test_accuracy, correct, total))
-        return test_accuracy
+        test_acc = 100. * correct / total
+        return round(test_acc,2)
