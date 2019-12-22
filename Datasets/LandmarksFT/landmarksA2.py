@@ -1,8 +1,14 @@
-import os
+import os, sys
 import numpy as np
-from keras.preprocessing import image
 import cv2
 import dlib
+
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
+import keras
+sys.stderr = stderr
+
+from keras.preprocessing import image
 
 # PATH TO ALL IMAGES
 global basedir, image_paths, target_size

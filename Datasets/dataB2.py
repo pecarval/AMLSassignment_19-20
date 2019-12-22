@@ -1,27 +1,21 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 19 11:12:35 2019
-@author: Pedro
-"""
-
-import pandas as pd
 import os
-from matplotlib import image
-import numpy as np
 import torch
-from torchvision import transforms, utils, datasets, models
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms, utils, datasets, models
 
 
-def mainB2():
+def mainB2VGG():
     '''
-    Loads data into dataloaders for model training, validation and
-    testing of task B2, performing data augmentation on training
-    data and pre-processing all data (normalization and re-sizing)
+    Loads train/validation/testing dataset into each separate dataloader
+    Applies transformations to each of the datasets (Pre-processing + Augmentation)
+    
+    Returns:
+        - dataloaders : PyTorch DataLoader with transformed train, val and test datasets
+        - dataset_sizes : Size of training and validation dataset (Needed for accuracy computation in training)
     '''
     
 
-    # Data normalization for training
+    # Data pre-processing and Augmentation for each dataset
     data_transforms = {
         'train': transforms.Compose([
             transforms.CenterCrop(178),
@@ -41,16 +35,13 @@ def mainB2():
         ])
     }
 
-    data_dir = 'dataset/B2/CNN/'
+    data_dir = './Datasets/dataset/B2/'
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                             data_transforms[x])
-                    for x in ['train', 'val']}
+                    for x in ['train', 'val','test']}
     dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=64,
                                                 shuffle=True, num_workers=4)
-                for x in ['train', 'val']}
+                for x in ['train', 'val','test']}
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
-    test_datasets = datasets.ImageFolder(os.path.join(data_dir, 'test'),data_transforms['test'])
-    test_dataloader = torch.utils.data.DataLoader(test_datasets, batch_size=64, shuffle=True, num_workers=4)
-
-    return dataloaders, test_dataloader, dataset_sizes
+    return dataloaders, dataset_sizes

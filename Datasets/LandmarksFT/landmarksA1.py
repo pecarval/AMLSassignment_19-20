@@ -1,12 +1,20 @@
-import os
 import numpy as np
+from scipy import ndarray
+import skimage as sk
+from skimage import util
+from skimage import transform
+import cv2, dlib, os, random, sys
+
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
+import keras
+sys.stderr = stderr
+
 from keras.preprocessing import image
-import cv2
-import dlib
 
 # PATH TO ALL IMAGES
 global basedir, image_paths, target_size
-basedir = '../Datasets/dataset/Original Datasets/celeba/'
+basedir = '../Datasets/dataset/A/'
 images_dir = os.path.join(basedir,'img')
 labels_filename = 'labels.csv'
 
