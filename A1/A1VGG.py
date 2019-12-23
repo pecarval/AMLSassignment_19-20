@@ -11,11 +11,10 @@ from torch.optim import lr_scheduler, SGD
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils, datasets, models
 
-sys.path.append('../Datasets/')
-from learning_curve_CNN import plot_acc_curve, plot_loss_curve
+from Datasets.learning_curve_CNN import plot_acc_curve, plot_loss_curve
 
 
-class A2:
+class A1:
 
     def __init__(self):
         '''
@@ -137,8 +136,8 @@ class A2:
         self.model.load_state_dict(best_model_wts)
 
         # Plotting learning curves
-        plot_loss_curve(losses, num_epochs, 'Train and Validation Losses in Task A2 (Pre-trained VGG)')
-        plot_acc_curve(accs, num_epochs, 'Train and Validation Accuracies in Task A2 (Pre-trained VGG)')
+        plot_loss_curve(losses, num_epochs, 'Train and Validation Losses in Task A1 (Pre-trained VGG)')
+        plot_acc_curve(accs, num_epochs, 'Train and Validation Accuracies in Task A1 (Pre-trained VGG)')
 
         return round(best_train_acc * 100.,2)
 

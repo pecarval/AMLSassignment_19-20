@@ -12,7 +12,7 @@ from keras.preprocessing import image
 
 # PATH TO ALL IMAGES
 global basedir, image_paths, target_size
-basedir = './Datasets/dataset/Original Datasets/celeba/'
+basedir = './Datasets/dataset/A/'
 images_dir = os.path.join(basedir,'img')
 labels_filename = 'labels.csv'
 

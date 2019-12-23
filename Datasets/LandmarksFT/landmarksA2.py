@@ -12,8 +12,8 @@ from keras.preprocessing import image
 
 # PATH TO ALL IMAGES
 global basedir, image_paths, target_size
-basedir = '../Datasets/dataset/Original Datasets/celeba/'
-images_dir = os.path.join(basedir,'img')
+basedir = '../Datasets/dataset/A/'
+images_dir = os.path.join(basedir,'img/')
 labels_filename = 'labels.csv'
 
 detector = dlib.get_frontal_face_detector()

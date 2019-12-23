@@ -124,7 +124,7 @@ def extract_lbp():
     # radius : Defines radius of circle of neighours
     # numPoints : Defines number of neighbours to be used in LBP
     numImgs = len(imgs)
-    radius = 8
+    radius = 2
     numPoints = 24
     hist_lbp = np.ones((numImgs, numPoints+2))
     
