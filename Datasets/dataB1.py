@@ -78,11 +78,11 @@ def dimensionality_reduction(train_data, test_data):
 
 
 # ======================================================================================================================
-# Data Pre-Processing for pre-trained VGG model
+# Data Pre-Processing for pre-trained CNN models
 # ======================================================================================================================
 
 
-def mainB1VGG():
+def mainB1CNN():
     '''
     Loads train/validation/testing dataset into each separate dataloader
     Applies transformations to each of the datasets (Pre-processing + Augmentation)
