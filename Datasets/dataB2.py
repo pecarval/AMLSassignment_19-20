@@ -4,7 +4,7 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils, datasets, models
 
 
-def mainB2VGG():
+def mainB2CNN():
     '''
     Loads train/validation/testing dataset into each separate dataloader
     Applies transformations to each of the datasets (Pre-processing + Augmentation)

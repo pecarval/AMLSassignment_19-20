@@ -11,8 +11,7 @@ from torch.optim import lr_scheduler, SGD
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils, datasets, models
 
-sys.path.append('../Datasets/')
-from learning_curve_CNN import plot_acc_curve, plot_loss_curve
+from Datasets.curvesCNN import plot_acc_curve, plot_loss_curve
 
 
 class B2:
@@ -20,7 +19,7 @@ class B2:
     def __init__(self):
         '''
         Imports the pre-trained VGG network to be used in this task
-        Makes changes to its fully-connected layer so that it can only return 2 classes
+        Makes changes to its fully-connected layer so that it can only return 5 classes
         '''
 
         # Define hyperparameters to be used
@@ -58,7 +57,7 @@ class B2:
             - sizes : Array of 2 elements with size of train and val datasets
 
         Returns:
-            - best_train_acc : Training ccuracy of the best epoch in %
+            - best_train_acc : Training accuracy of the best epoch in %
         '''
 
         best_model_wts = copy.deepcopy(self.model.state_dict())
