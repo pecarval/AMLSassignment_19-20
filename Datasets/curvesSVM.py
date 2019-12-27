@@ -83,7 +83,9 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     test_scores_mean = np.mean(test_scores, axis=1)
     test_scores_std = np.std(test_scores, axis=1)
 
+    plt.rcParams.update({'font.size': 24})
     # Plot learning curve
+    plt.figure(1, figsize=(10, 10))
     plt.grid()
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
                          train_scores_mean + train_scores_std, alpha=0.1,
@@ -95,12 +97,12 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
                  label="Training score")
     plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
                  label="Cross-validation score")
-    plt.figure(1, figsize=(20/3, 6))
-    plt.title(title)
+    #plt.title(title)
     if ylim is not None:
         plt.ylim(*ylim)
     plt.xlabel("Training examples")
     plt.ylabel("Score")
     plt.legend(loc="best")
+    plt.tight_layout()
     plt.savefig(title + '.png')
     plt.clf()

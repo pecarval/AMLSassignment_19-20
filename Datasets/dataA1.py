@@ -102,9 +102,10 @@ def mainA1LBP():
     data_train, data_test, lbs_train, lbs_test = train_test_split(imgs, lbs, test_size=0.1)
 
     # Applying dimensionality reduction to dataset
-    pca_train, pca_test = dimensionality_reductionLBP(data_train, data_test)
+    #pca_train, pca_test = dimensionality_reductionLBP(data_train, data_test)
 
-    return pca_train, pca_test, lbs_train, lbs_test
+    #return pca_train, pca_test, lbs_train, lbs_test
+    return data_train, data_test, lbs_train, lbs_test
 
 def extract_lbp():
     '''

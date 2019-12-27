@@ -14,7 +14,7 @@ from keras.preprocessing import image
 
 # PATH TO ALL IMAGES
 global basedir, image_paths, target_size
-basedir = './Datasets/dataset/B1/'
+basedir = './Datasets/dataset/B1/SVM/'
 images_dir = os.path.join(basedir,'img')
 labels_filename = 'labels.csv'
 
