@@ -7,7 +7,7 @@ from sklearn.model_selection import cross_validate
 from Datasets.curvesSVM import plot_learning_curve
 
 
-class A1:
+class A2:
     '''
     Class responsible for initializing, training and testing the SVM model
     with facial landmarks as features.
@@ -16,12 +16,11 @@ class A1:
     def __init__(self):
         '''
         Initializes the SVM to be used in this task, with
-        parameters found in Grid Search CV (file: hyperparametersA1model1.ipynb)
+        parameters found in Grid Search CV (file: hyperparametersA2model1.ipynb)
         '''
 
         # Best parameters for Facial landmarks model 
-        self.svm = SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42)
-
+        self.svm = SVC(C=3, kernel='rbf', gamma=0.001, probability=True, random_state=42)
 
     def train(self, data_train, lbs_train):
         '''
@@ -51,7 +50,7 @@ class A1:
         train_accuracy = accuracy_score(lbs_train, predictions) * 100
 
         # Obtain learning curve (Saves it in main directory)
-        plot_learning_curve(SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42),"Learning Curve for A1 Task (SVM with facial landmarks)", data_train, lbs_train,cv=5)
+        plot_learning_curve(SVC(C=3, kernel='rbf', gamma=0.001, probability=True, random_state=42),"Learning Curve for A2 Task (SVM with facial landmarks)", data_train, lbs_train,cv=5)
 
         return round(train_accuracy,2)
 

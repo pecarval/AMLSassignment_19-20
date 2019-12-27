@@ -4,7 +4,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_validate
 
-from Datasets.plot_curve import plot_learning_curve
+from Datasets.curvesSVM import plot_learning_curve
 
 
 class A1:

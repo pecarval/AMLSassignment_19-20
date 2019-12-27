@@ -14,7 +14,7 @@ from torchvision import transforms, utils, datasets, models
 from Datasets.curvesCNN import plot_acc_curve, plot_loss_curve
 
 
-class A1:
+class A2:
 
     def __init__(self):
         '''
@@ -136,8 +136,8 @@ class A1:
         self.model.load_state_dict(best_model_wts)
 
         # Plotting learning curves
-        plot_loss_curve(losses, num_epochs, 'Train and Validation Losses in Task A1 (Pre-trained VGG)')
-        plot_acc_curve(accs, num_epochs, 'Train and Validation Accuracies in Task A1 (Pre-trained VGG)')
+        plot_loss_curve(losses, num_epochs, 'Train and Validation Losses in Task A2 (Pre-trained VGG)')
+        plot_acc_curve(accs, num_epochs, 'Train and Validation Accuracies in Task A2 (Pre-trained VGG)')
 
         return round(best_train_acc * 100.,2)
 
