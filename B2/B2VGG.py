@@ -1,17 +1,11 @@
-import os, time, copy, sys
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
 import torch
 import torchvision
 import torch.nn as nn
 from torch.optim import lr_scheduler, SGD
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils, datasets, models
+from torchvision import utils, datasets, models
 
-from Datasets.curvesCNN import plot_acc_curve, plot_loss_curve
+from HelperFunctions.cnnMethods import train_cnn, test_cnn
+from HelperFunctions.curvesCNN import plot_acc_curve, plot_loss_curve
 
 
 class B2:
@@ -19,13 +13,14 @@ class B2:
     def __init__(self):
         '''
         Imports the pre-trained VGG network to be used in this task
-        Makes changes to its fully-connected layer so that it can only return 5 classes
+        Makes changes to its fully-connected layer so that it can only return 2 classes
         '''
 
         # Define hyperparameters to be used
         LEARNING_RATE = 0.002
         STEP_SIZE = 10
         DECAYING_FACTOR = 0.1
+        self.NUM_EPOCHS = 25
 
         # Importing & Changing pre-trained VGG model
         self.model = models.vgg16(pretrained=True)
@@ -45,10 +40,9 @@ class B2:
             self.model.cuda()
 
 
-    def train(self, dataloader, sizes, num_epochs=25):
+    def train(self, dataloader, sizes):
         '''
-        Trains the CNN model for a number of epochs
-        Loads the final model as being the one with the highest validation accuracy
+        Trains the VGG model for a number of epochs
         Plots 2 learning curves showing the evolution of accuracy
         and loss at each epoch of training
 
@@ -60,86 +54,13 @@ class B2:
             - best_train_acc : Training accuracy of the best epoch in %
         '''
 
-        best_model_wts = copy.deepcopy(self.model.state_dict())
-        best_acc = 0.0
-        prev_acc = 0.0
-
-        # Initializing arrays to keep track of loss 
-        # and accuracy at each epoch
-        losses = dict()
-        losses['train'] = np.ones(num_epochs)
-        losses['val'] = np.ones(num_epochs)
-        accs = dict()
-        accs['train'] = np.ones(num_epochs)
-        accs['val'] = np.ones(num_epochs)
-
-        train_on_gpu = torch.cuda.is_available()
-        if train_on_gpu:
-            print('using gpu')
-            self.model.cuda()
-
-        for epoch in range(num_epochs):
-
-            for phase in ['train', 'val']:
-                if phase == 'train':
-                    self.model.train()
-                else:
-                    self.model.eval()
-
-                running_loss = 0.0
-                running_corrects = 0
-
-                # Iterate over data.
-                for inputs, labels in dataloader[phase]:
-                    if train_on_gpu:
-                        inputs, labels = inputs.cuda(), labels.cuda()
-
-                    # Zero parameter gradients
-                    self.optimizer.zero_grad()
-
-                    # Forward propagation
-                    with torch.set_grad_enabled(phase == 'train'):
-                        outputs = self.model(inputs)
-                        _, preds = torch.max(outputs, 1)
-                        loss = self.criterion(outputs, labels)
-
-                        # Implementing backward propagation + Optimization
-                        # if in train phase
-                        if phase == 'train':
-                            loss.backward()
-                            self.optimizer.step()
-
-                    # Computing statistics
-                    running_loss += loss.item() * inputs.size(0)
-                    running_corrects += torch.sum(preds == labels.data)
-
-                if phase == 'train':
-                    self.scheduler.step()
-
-                # Computing loss and accuracy at the epoch
-                epoch_loss = running_loss / sizes[phase]
-                losses[phase][epoch] = epoch_loss
-                epoch_acc = running_corrects.double() / sizes[phase]
-                accs[phase][epoch] = epoch_acc
-
-                if phase == 'train':
-                    prev_acc = epoch_acc
-
-                # Save the best mmodel so far
-                if phase == 'val' and epoch_acc > best_acc:
-                    best_train_acc = prev_acc
-                    best_acc = epoch_acc
-                    best_model_wts = copy.deepcopy(self.model.state_dict())
-
-        # Load best model weights as the model
-        # Best model weights assumed to be the ones with highest validation accuracy
-        self.model.load_state_dict(best_model_wts)
+        self.model, best_train_acc, accs, losses = train_cnn(self.model, dataloader, sizes, self.NUM_EPOCHS, self.criterion, self.optimizer, self.scheduler)
 
         # Plotting learning curves
-        plot_loss_curve(losses, num_epochs, 'Train and Validation Losses in Task B2 (Pre-trained VGG)')
-        plot_acc_curve(accs, num_epochs, 'Train and Validation Accuracies in Task B2 (Pre-trained VGG)')
+        plot_loss_curve(losses, self.NUM_EPOCHS, 'Train and Validation Losses in Task B2 (Pre-trained VGG)')
+        plot_acc_curve(accs, self.NUM_EPOCHS, 'Train and Validation Accuracies in Task B2 (Pre-trained VGG)')
 
-        return round(best_train_acc * 100.,2)
+        return best_train_acc
 
 
     def test(self, dataloader):
@@ -153,35 +74,5 @@ class B2:
             - test_acc : Testing accuracy of the model in %
         '''
 
-        test_loss = 0.
-        correct = 0.
-        total = 0.
-
-        train_on_gpu = torch.cuda.is_available()
-        if train_on_gpu:
-            self.model.cuda()
-
-        for batch_idx, (data, target) in enumerate(dataloader['test']):
-
-                # Move to GPU
-                if train_on_gpu:
-                    data, target = data.cuda(), target.cuda()
-
-                # Forward pass: compute predicted outputs by passing inputs to the model
-                output = self.model(data)
-
-                # Calculate loss
-                loss = self.criterion(output, target)
-
-                # Update average test loss 
-                test_loss = test_loss + ((1 / (batch_idx + 1)) * (loss.data - test_loss))
-
-                # Convert output probabilities to predicted class
-                pred = output.data.max(1, keepdim=True)[1]
-
-                # Compare predictions to true label
-                correct += np.sum(np.squeeze(pred.eq(target.data.view_as(pred))).cpu().numpy())
-                total += data.size(0)
-
-        test_acc = 100. * correct / total
-        return round(test_acc,2)
+        test_acc = test_cnn(self.model, dataloader, self.criterion)
+        return test_acc

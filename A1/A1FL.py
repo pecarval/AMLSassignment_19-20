@@ -4,7 +4,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_validate
 
-from Datasets.curvesSVM import plot_learning_curve
+from HelperFunctions.curvesSVM import plot_learning_curve
 
 
 class A1:
@@ -20,8 +20,8 @@ class A1:
         '''
 
         # Best parameters for Facial landmarks model 
-        self.svm = SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42)
-
+        #self.svm = SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42)
+        self.svm = SVC(C=3, kernel='linear', gamma='scale', probability=True, random_state=42)
 
     def train(self, data_train, lbs_train):
         '''
@@ -40,11 +40,9 @@ class A1:
         self.svm.fit(data_train, lbs_train)
 
         ## To perform Cross-Validation : Uncomment this block
-        '''
-        cv_results = cross_validate(SVC(C=10, kernel='rbf', gamma=0.001, probability=True, random_state=42), data_train, lbs_train, cv=3, return_estimator=True)
+        cv_results = cross_validate(SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42), data_train, lbs_train, cv=3, return_estimator=True)
         accuracies = cv_results['test_score']
-        print("Mean Validation Accuracy: %0.2f (+/- %0.2f)" % (accuracies.mean(), accuracies.std() * 2))
-        '''
+        print("Mean Validation Accuracy FL: %0.2f (+/- %0.2f)" % (accuracies.mean() * 100, accuracies.std() * 2 * 100))
 
         # Computing training accuracy
         predictions = self.svm.predict(data_train)
