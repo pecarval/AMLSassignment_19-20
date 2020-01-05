@@ -16,7 +16,6 @@ To install all libraries and packages necessary to run this project, run:
 ```
 pip install requirements.txt
 ```
-
 ## Dataset Installation
 
 Please download the dataset necessary for this project here. Unzip it and add the folder inside the *Datasets* folder.
@@ -61,21 +60,24 @@ The project has the following structure,
 **B1** (folder) : Contains models for B1 Task, and Jupyter notebook showing how hyperparameters were fine-tuned
 * **B1FL.py** : Trains and tests a SVM model with facial landmarks as features
 * **B1VGG.py** : Trains, validates and tests a pre-trained VGG model with raw pixels as input
-* **hypeparametersA2model1.ipynb** : Jupyter notebook that performs Grid-Search CV to find best parameters for SVM model with facial landmarks
+* **hyperparametersB1model1.ipynb** : Jupyter notebook that performs Grid-Search CV to find best parameters for SVM model with facial landmarks
 
 **B2** (folder) : Contains models for B2 Task
 * **B2VGG.py** : Trains, validates and tests a pre-trained VGG model with raw pixels as input
 
 **Datasets** (folder) : Contains data pre-processing files, curve plotting scripts and original dataset
 * **dataset** (folder) : Folder downloaded from here, where all the data used in the project is.
-* **LandmarksFT** (folder) : Folder that contains landmark computation scripts that are used in the hyper-parameter tuning files.
-* **LandmarksMain** (folder) : Folder that contains landmark computation scripts that are used in data pre-processing files.
 * **dataA1.py** : Pre-processes and augments data for each model implemented for Task A1
 * **dataA2.py** : Pre-processes and augments data for each model implemented for Task A2
 * **dataB1.py** : Pre-processes and augments data for each model implemented for Task B1
 * **dataB2.py** : Pre-processes and augments data for each model implemented for Task B2
-* **curvesCNN.py** : Plots accuracy vs. epoch & loss vs. epoch curves for CNN models
-* **curvesSVM.py** : Plots accuracy vs. training examples curve for SVM models
+
+**HelperFunctions** (folder) : Contains data pre-processing files, curve plotting scripts and original dataset
+* **LandmarksFT** (folder) : Folder that contains landmark computation scripts that are used in the hyper-parameter tuning files.
+* **LandmarksMain** (folder) : Folder that contains landmark computation scripts that are used in data pre-processing files.
+* **cnnMethods.py** : Script containing functions to train and test a CNN
+* **curvesCNN.py** : Functions that plot learnign curves for CNN models
+* **curvesSVM.py** : Function that plots learnign curve for SVM model
 
 **main.py** : Trains and tests model chosen for each task, printing the train and test accuracy for each
 
@@ -86,6 +88,3 @@ The project has the following structure,
 **mainB1.py** : Trains and tests each model implemented for Task B1, printing the train and test accuracy for each
 
 **mainB2.py** : Trains and tests each model implemented for Task B2, printing the train and test accuracy for each
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
