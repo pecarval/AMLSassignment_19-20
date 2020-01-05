@@ -14,7 +14,7 @@ import torch
 from torchvision import transforms, utils, datasets, models
 from torch.utils.data import Dataset, DataLoader
 
-import Datasets.LandmarksMain.landmarksA1 as landmarks
+import HelperFunctions.LandmarksMain.landmarksA1 as landmarks
 
 
 # ======================================================================================================================
@@ -86,11 +86,10 @@ def mainA1LBP():
     '''
     Extracts LBP histograms for each picture
     Performs train/test spliting (90% train, 10% test)
-    Implements dimensionality reduction by scaling and performing PCA
     
     Returns:
-        - pca_train : Train dataset of LBP after PCA
-        - pca_test : Test dataset of LBP after PCA
+        - data_train : Train dataset of LBP histogram bins
+        - data_test : Test dataset of LBP histogram bins
         - lbs_train : Labels of training dataset
         - lbs_test : Labels of testing dataset
     '''
@@ -101,10 +100,6 @@ def mainA1LBP():
     # Splitting dataset into 90% train and 10% test
     data_train, data_test, lbs_train, lbs_test = train_test_split(imgs, lbs, test_size=0.1)
 
-    # Applying dimensionality reduction to dataset
-    #pca_train, pca_test = dimensionality_reductionLBP(data_train, data_test)
-
-    #return pca_train, pca_test, lbs_train, lbs_test
     return data_train, data_test, lbs_train, lbs_test
 
 def extract_lbp():
@@ -166,36 +161,6 @@ def grayscale():
     
     labels = np.array(all_labels)
     return imgs, labels
-
-
-def dimensionality_reductionLBP(train_data, test_data):
-    '''
-    Scales train and test datasets
-    Implements Principal Component Analysis (PCA) on both datasets
-
-    Keyword arguments:
-        - train_data : Raw train dataset of LBP
-        - test_data : Raw test dataset of LBP
-
-    Returns:
-        - train_pca : Train dataset of LBP after PCA
-        - test_pca : Train dataset of LBP after PCA
-    '''
-
-    # Scaling datasets
-    scaler = StandardScaler()
-    scaler.fit(train_data)
-    train_data = scaler.transform(train_data)
-    test_data = scaler.transform(test_data)
-
-    # Applying PCA to datasets
-    # 'mle' algorithm not used since n_components > n_features
-    pca = PCA(n_components = 0.8, svd_solver = 'full')
-    pca.fit(train_data)
-    train_pca = pca.transform(train_data)
-    test_pca = pca.transform(test_data)
-
-    return train_pca, test_pca
 
 
 # ======================================================================================================================

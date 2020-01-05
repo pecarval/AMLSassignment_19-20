@@ -20,7 +20,6 @@ class A1:
         '''
 
         # Best parameters for Facial landmarks model 
-        #self.svm = SVC(C=30, kernel='rbf', gamma=0.001, probability=True, random_state=42)
         self.svm = SVC(C=3, kernel='linear', gamma='scale', probability=True, random_state=42)
 
     def train(self, data_train, lbs_train):

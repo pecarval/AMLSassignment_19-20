@@ -13,7 +13,7 @@ from skimage.feature import local_binary_pattern
 import torch
 from torchvision import transforms, utils, datasets, models
 from torch.utils.data import Dataset, DataLoader
-import Datasets.LandmarksMain.landmarksB1 as landmarks
+import HelperFunctions.LandmarksMain.landmarksB1 as landmarks
 
 
 # ======================================================================================================================
