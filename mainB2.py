@@ -14,29 +14,29 @@ dataB2_CNN, dataset_sizes = dataB2.mainB2CNN()
 
 # ======================================================================================================================
 # Task B2 with pre-trained VGG model
-'''
+
 model1_B2 = B2_VGG()
 acc1_B2_train = model1_B2.train(dataB2_CNN, dataset_sizes)
 acc1_B2_test = model1_B2.test(dataB2_CNN)
-'''
-# Clean up memory
-#del model1_B2
 
-acc1_B2_train = 'TBD'
-acc1_B2_test = 'TBD'
+# Clean up memory
+del model1_B2
+
+# acc1_B2_train = 'TBD'
+# acc1_B2_test = 'TBD'
 
 # ======================================================================================================================
 # Task B2 with pre-trained ResNet model
-'''
+
 model2_B2 = B2_ResNet()
 acc2_B2_train = model2_B2.train(dataB2_CNN, dataset_sizes)
 acc2_B2_test = model2_B2.test(dataB2_CNN)
-'''
-# Clean up memory
-#del model2_B2, dataB2_3, dataset_sizes
 
-acc2_B2_train = 'TBD'
-acc2_B2_test = 'TBD'
+# Clean up memory
+del model2_B2, dataB2_CNN, dataset_sizes
+
+# acc2_B2_train = 'TBD'
+# acc2_B2_test = 'TBD'
 
 
 # ======================================================================================================================

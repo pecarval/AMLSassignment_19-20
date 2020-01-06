@@ -1,9 +1,9 @@
-import sys
+import sys, time
 import numpy as np
 import pandas as pd
 
 from A2.A2SVM import A2 as A2_SVM
-from A2.A2CNN import A2 as A2_VGG
+from A2.A2VGG import A2 as A2_VGG
 
 from Datasets import dataA2
 
@@ -24,22 +24,22 @@ acc1_A2_test = model1_A2.test(dataA2_test1, lbsA2_test1)
 # Clean up memory
 del model1_A2, dataA2_train1, dataA2_test1, lbsA2_train1, lbsA2_test1
 
-#acc1_A2_train = 'TBD'
-#acc1_A2_test = 'TBD'
+# acc1_A2_train = 'TBD'
+# acc1_A2_test = 'TBD'
 
 
 # ======================================================================================================================
 # Task A2 with pre-trained VGG model
-'''
+
 model2_A2 = A2_VGG()
 acc2_A2_train = model2_A2.train(dataA2_2, dataset_sizes)
 acc2_A2_test = model2_A2.test(dataA2_2)
-'''
-# Clean up memory
-#del model2_A2, dataA2_3, dataset_sizes
 
-acc2_A2_train = 'TBD'
-acc2_A2_test = 'TBD'
+# Clean up memory
+del model2_A2, dataA2_2, dataset_sizes
+
+# acc2_A2_train = 'TBD'
+# acc2_A2_test = 'TBD'
 
 
 # ======================================================================================================================

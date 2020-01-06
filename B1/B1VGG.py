@@ -8,7 +8,7 @@ from HelperFunctions.cnnMethods import train_cnn, test_cnn
 from HelperFunctions.curvesCNN import plot_acc_curve, plot_loss_curve
 
 
-class A2:
+class B1:
 
     def __init__(self):
         '''
@@ -16,11 +16,11 @@ class A2:
         Makes changes to its fully-connected layer so that it can only return 2 classes
         '''
 
-        # Define hyperparameters to be used
-        LEARNING_RATE = 0.002
-        STEP_SIZE = 10
-        DECAYING_FACTOR = 0.1
-        self.NUM_EPOCHS = 25
+        # Define B1 hyperparameters to be used
+        LEARNING_RATE = 0.00002
+        STEP_SIZE = 5
+        DECAYING_FACTOR = 0.9
+        self.NUM_EPOCHS = 15
 
         # Importing & Changing pre-trained VGG model
         self.model = models.vgg16(pretrained=True)

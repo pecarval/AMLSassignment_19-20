@@ -16,10 +16,10 @@ class A2:
         Makes changes to its fully-connected layer so that it can only return 2 classes
         '''
 
-        # Define hyperparameters to be used
-        LEARNING_RATE = 0.002
-        STEP_SIZE = 10
-        DECAYING_FACTOR = 0.1
+        # Define A2 hyper-parameters to be used
+        LEARNING_RATE = 0.0002
+        STEP_SIZE = 5
+        DECAYING_FACTOR = 0.5
         self.NUM_EPOCHS = 25
 
         # Importing & Changing pre-trained VGG model

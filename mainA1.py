@@ -1,4 +1,4 @@
-import sys
+import sys, time
 import numpy as np
 import pandas as pd
 
@@ -13,15 +13,13 @@ from Datasets import dataA1
 
 dataA1_train1, dataA1_test1, lbsA1_train1, lbsA1_test1 = dataA1.mainA1Landmarks()
 dataA1_train2, dataA1_test2, lbsA1_train2, lbsA1_test2 = dataA1.mainA1LBP()
-#dataA1_3, dataset_sizes = dataA1.mainA1VGG()
+dataA1_3, dataset_sizes = dataA1.mainA1VGG()
 
 # ======================================================================================================================
 # Task A1 with Facial Landmarks as Feature
-
 model1_A1 = A1_FL()
 acc1_A1_train = model1_A1.train(dataA1_train1, lbsA1_train1)
 acc1_A1_test = model1_A1.test(dataA1_test1, lbsA1_test1)
-
 # Clean up memory
 del model1_A1, dataA1_train1, dataA1_test1, lbsA1_train1, lbsA1_test1
 
@@ -43,16 +41,16 @@ del model2_A1, dataA1_train2, dataA1_test2, lbsA1_train2, lbsA1_test2
 
 # ======================================================================================================================
 # Task A1 with pre-trained VGG model
-'''
+
 model3_A1 = A1_VGG()
 acc3_A1_train = model3_A1.train(dataA1_3, dataset_sizes)
 acc3_A1_test = model3_A1.test(dataA1_3)
-'''
-# Clean up memory
-#del model3_A1, dataA1_3, dataset_sizes
 
-acc3_A1_train = 'TBD'
-acc3_A1_test = 'TBD'
+# Clean up memory
+del model3_A1, dataA1_3, dataset_sizes
+
+#acc3_A1_train = 'TBD'
+#acc3_A1_test = 'TBD'
 
 
 # ======================================================================================================================

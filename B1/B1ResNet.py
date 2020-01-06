@@ -16,10 +16,11 @@ class B1:
         Makes changes to its fully-connected layer so that it can only return 5 classes
         '''
 
-        # Define hyperparameters to be used
-        LEARNING_RATE = 0.002
-        STEP_SIZE = 10
-        DECAYING_FACTOR = 0.1
+        # Define B1 hyper-parameters to be used
+        LEARNING_RATE = 0.00002
+        STEP_SIZE = 5
+        DECAYING_FACTOR = 0.9
+        self.NUM_EPOCHS = 15
 
         # Importing & Changing pre-trained ResNet model
         self.model = models.resnet18(pretrained=True)
