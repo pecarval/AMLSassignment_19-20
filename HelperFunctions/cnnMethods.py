@@ -132,7 +132,7 @@ def test_cnn(model, dataloader, criterion):
     if train_on_gpu:
         model.cuda()
 
-    for batch_idx, (data, target) in enumerate(dataloader['test']):
+    for batch_idx, (data, target) in enumerate(dataloader):
 
             # Move to GPU
             if train_on_gpu:

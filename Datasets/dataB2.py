@@ -10,7 +10,8 @@ def mainB2CNN():
     Applies transformations to each of the datasets (Pre-processing + Augmentation)
     
     Returns:
-        - dataloaders : PyTorch DataLoader with transformed train, val and test datasets
+        - dataloaders : PyTorch DataLoader with transformed train and validation datasets
+        - test_dataloaders : PyTorch DataLoader with transformed test and additional test datasets
         - dataset_sizes : Size of training and validation dataset (Needed for accuracy computation in training)
     '''
     
@@ -36,12 +37,11 @@ def mainB2CNN():
     }
 
     data_dir = './Datasets/dataset/B2/'
-    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
-                                            data_transforms[x])
-                    for x in ['train', 'val','test']}
-    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=64,
-                                                shuffle=True, num_workers=4)
-                for x in ['train', 'val','test']}
+    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
+    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=64, shuffle=True, num_workers=4) for x in ['train', 'val']}
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
-    return dataloaders, dataset_sizes
+    test_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms['test']) for x in ['test', 'addtest']}
+    test_dataloaders = {x: torch.utils.data.DataLoader(test_datasets[x], batch_size=64, shuffle=True, num_workers=4) for x in ['test', 'addtest']}
+
+    return dataloaders, test_dataloaders, dataset_sizes

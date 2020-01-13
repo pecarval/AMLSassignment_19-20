@@ -34,21 +34,23 @@ def mainB1Landmarks():
         - lbs_test : Labels of testing dataset
     '''
     
-    # Extracting facil landmarks
-    imgs, lbs = landmarks.extract_features_labels()
+    # Extracting facial landmarks
+    train_imgs, lbs = landmarks.extract_features_labels('./Datasets/dataset/B1/SVM/original/')
+    addtest_imgs, lbs_addtest = landmarks.extract_features_labels('./Datasets/dataset/B1/SVM/addtest/')
 
     # Splitting data into 90% train and 10% test
-    tr_data, te_data, lbs_train, lbs_test = train_test_split(imgs, lbs, test_size=0.1)
+    tr_data, te_data, lbs_train, lbs_test = train_test_split(train_imgs, lbs, test_size=0.1)
     data_train = tr_data.reshape(tr_data.shape[0], tr_data.shape[1]*tr_data.shape[2])
     data_test = te_data.reshape(te_data.shape[0], te_data.shape[1]*te_data.shape[2])
+    data_addtest = addtest_imgs.reshape(addtest_imgs.shape[0], addtest_imgs.shape[1]*addtest_imgs.shape[2])
 
     # Applying dimensionality reduction
-    pca_train, pca_test = dimensionality_reduction(data_train, data_test)
+    pca_train, pca_test, pca_addtest = dimensionality_reduction(data_train, data_test, data_addtest)
 
-    return pca_train, pca_test, lbs_train, lbs_test
+    return pca_train, pca_test, pca_addtest, lbs_train, lbs_test, lbs_addtest
  
 
-def dimensionality_reduction(train_data, test_data):
+def dimensionality_reduction(train_data, test_data, addtest_data):
     '''
     Scales train and test datasets
     Implements Principal Component Analysis (PCA) on both datasets
@@ -56,10 +58,12 @@ def dimensionality_reduction(train_data, test_data):
     Keyword arguments:
         - train_data : Raw train dataset of facial landmarks
         - test_data : Raw test dataset of facial landmarks
+        - addtest_data : Raw additional test dataset of facial landmarks
 
     Returns:
         - train_pca : Train dataset of facial landmarks after PCA
-        - test_pca : Train dataset of facial landmarks after PCA
+        - test_pca : Test dataset of facial landmarks after PCA
+        - addtest_pca : Additional test dataset of facial landmarks after PCA
     '''
 
     # Scaling both datasets
@@ -67,14 +71,16 @@ def dimensionality_reduction(train_data, test_data):
     scaler.fit(train_data)
     train_data = scaler.transform(train_data)
     test_data = scaler.transform(test_data)
+    addtest_data = scaler.transform(addtest_data)
 
     # Applying PCA to both datasets
     pca = PCA(n_components = 'mle', svd_solver = 'full')
     pca.fit(train_data)
     train_pca = pca.transform(train_data)
     test_pca = pca.transform(test_data)
+    addtest_pca = pca.transform(addtest_data)
 
-    return train_pca, test_pca
+    return train_pca, test_pca, addtest_pca
 
 
 # ======================================================================================================================
@@ -88,7 +94,8 @@ def mainB1CNN():
     Applies transformations to each of the datasets (Pre-processing + Augmentation)
     
     Returns:
-        - dataloaders : PyTorch DataLoader with transformed train, val and test datasets
+        - dataloaders : PyTorch DataLoader with transformed train and validation datasets
+        - test_dataloaders : PyTorch DataLoader with transformed test and additional test datasets
         - dataset_sizes : Size of training and validation dataset (Needed for accuracy computation in training)
     '''
     
@@ -114,12 +121,11 @@ def mainB1CNN():
     }
 
     data_dir = './Datasets/dataset/B1/CNN/'
-    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
-                                            data_transforms[x])
-                    for x in ['train', 'val','test']}
-    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=64,
-                                                shuffle=True, num_workers=4)
-                for x in ['train', 'val','test']}
+    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
+    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=64, shuffle=True, num_workers=4) for x in ['train', 'val']}
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
-    return dataloaders, dataset_sizes
+    test_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms['test']) for x in ['test', 'addtest']}
+    test_dataloaders = {x: torch.utils.data.DataLoader(test_datasets[x], batch_size=64, shuffle=True, num_workers=4) for x in ['test', 'addtest']}
+
+    return dataloaders, test_dataloaders, dataset_sizes
