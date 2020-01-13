@@ -42,7 +42,7 @@ python main<task>.py
 
 where *task* should be substituted by the task name i.e. A1, A2, B1 or B2.
 
-This script will output the train, test and additional test sets accuracies for each of the models tested by the selected task.
+This script will output the train, test and additional test sets accuracies for each of the models tested for the selected task.
 
 ## Project Structure
 
