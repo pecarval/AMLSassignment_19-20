@@ -6,7 +6,7 @@ This repository implements the ELEC0134 Applied Machine Learning Systems assignm
 * Task B1: Face Shape Recognition
 * Task B2: Eye Colour Recognition
 
-Tasks A1 and A2 are binary classification problems. A1 classifies for "male" or "female". A2 classifies for "smile" or "no smile".
+Tasks A1 and A2 are binary classification problems.
 Tasks B1 and B2 are multi-class classification problems, each with 5 different classes.
 
 ## Software Installation
@@ -30,22 +30,22 @@ To run the project's main program, move into the project's directory and once in
 python main.py
 ```
 
-This script will output the training and testing accuracies for each of the tasks, as required in the assigment description.
+This script will output the train, test and additional test sets accuracies of the final model selected for each task.
 
 
-To run all the possible models for each task, move into the project's directory and once in it, run:
+To run all developed models for each task, move into the project's directory and once in it, run:
 
 ```
 python main<task>.py
 ```
 
-where *<task>* should be substituted by the task name i.e. A1, A2, B1 or B2.
+where *task* should be substituted by the task name i.e. A1, A2, B1 or B2.
 
-This script will output the training and testing accuracies for each of the models tested by the tasks you selected.
+This script will output the train, test and additional test sets accuracies for each of the models tested by the selected task.
 
 ## Project Structure
 
-The project has the following structure,
+The project has the following structure:
 
 **A1** (folder) : Contains models for A1 Task, and Jupyter notebooks showing how hyperparameters were fine-tuned
 * **A1FL.py** : Trains and tests a SVM model with facial landmarks as features
@@ -69,19 +69,20 @@ The project has the following structure,
 * **B2VGG.py** : Trains, validates and tests a pre-trained VGG model with raw pixels as input
 * **B2ResNet.py** : Trains, validates and tests a pre-trained ResNet model with raw pixels as input
 
-**Datasets** (folder) : Contains data pre-processing files, curve plotting scripts and original dataset
+**Datasets** (folder) : Contains data pre-processing files and original dataset
 * **dataset** (folder) : Folder downloaded from here, where all the data used in the project is.
 * **dataA1.py** : Pre-processes and augments data for each model implemented for Task A1
 * **dataA2.py** : Pre-processes and augments data for each model implemented for Task A2
 * **dataB1.py** : Pre-processes and augments data for each model implemented for Task B1
 * **dataB2.py** : Pre-processes and augments data for each model implemented for Task B2
 
-**HelperFunctions** (folder) : Contains data pre-processing files, curve plotting scripts and original dataset
-* **LandmarksFT** (folder) : Folder that contains landmark computation scripts that are used in the hyper-parameter tuning files.
-* **LandmarksMain** (folder) : Folder that contains landmark computation scripts that are used in data pre-processing files.
+**HelperFunctions** (folder) : Contains CNN methods, curve plotting and landmark computation scripts
 * **cnnMethods.py** : Script containing functions to train and test a CNN
 * **curvesCNN.py** : Functions that plot learning curves for CNN models
 * **curvesSVM.py** : Function that plots learning curve for SVM models
+* **landmarksA1.py** : Script to compute facial landmarks for task A1
+* **landmarksA2.py** : Script to compute facial landmarks for task A2
+* **landmarksB1.py** : Script to compute facial landmarks for task B1
 
 **main.py** : Trains and tests model chosen for each task, printing the train and test accuracy for each
 

@@ -19,6 +19,8 @@ def plot_acc_curve(accs, num_epochs, title):
     plt.legend()
     plt.title(title)
     plt.savefig(title + '.png')
+    plt.clf()
+    plt.close()
 
 
 def plot_loss_curve(losses, num_epochs, title):
@@ -39,3 +41,5 @@ def plot_loss_curve(losses, num_epochs, title):
     plt.legend()
     plt.title(title)
     plt.savefig(title + '.png')
+    plt.clf()
+    plt.close()

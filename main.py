@@ -11,8 +11,8 @@ from Datasets import dataA1, dataA2, dataB1, dataB2
 # ======================================================================================================================
 # Data Pre-Processing
 
-dataA1, sizesA1 = dataA1.mainA1VGG()
-dataA2, sizesA2 = dataA2.mainA2VGG()
+dataA1, testdataA1, sizesA1 = dataA1.mainA1VGG()
+dataA2, testdataA2, sizesA2 = dataA2.mainA2VGG()
 dataB1, sizesB1 = dataB1.mainB1CNN()
 dataB2, sizesB2 = dataB2.mainB2CNN()
 
@@ -21,7 +21,7 @@ dataB2, sizesB2 = dataB2.mainB2CNN()
 
 modelA1 = A1()
 acc_A1_train = modelA1.train(dataA1, sizesA1)
-acc_A1_test = modelA1.test(dataA1)
+acc_A1_test = modelA1.test(testdataA1)
 
 # Clean up memory
 del modelA1, dataA1, sizesA1
@@ -34,7 +34,7 @@ del modelA1, dataA1, sizesA1
 
 modelA2 = A2()
 acc_A2_train = modelA2.train(dataA2, sizesA2)
-acc_A2_test = modelA2.test(dataA2)
+acc_A2_test = modelA2.test(testdataA2)
 
 # Clean up memory
 del modelA2, dataA2, sizesA2

@@ -14,7 +14,7 @@ import torch
 from torchvision import transforms, utils, datasets, models
 from torch.utils.data import Dataset, DataLoader
 
-import HelperFunctions.LandmarksMain.landmarksA1 as landmarks
+import HelperFunctions.landmarksA1 as landmarks
 
 
 # ======================================================================================================================
