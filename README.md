@@ -16,11 +16,12 @@ To install all libraries and packages necessary to run this project, run:
 ```
 pip install requirements.txt
 ```
+
 ## Dataset Installation
 
-Please download the dataset necessary for this project here. Unzip it and add the folder inside the *Datasets* folder.
+Please download the dataset necessary for this project [here](https://drive.google.com/open?id=1LOivxHk_6kZ8LpOWvdqo4DZzAIfF1cVP). Unzip it and add the folder inside the *Datasets* folder.
 
-The whole project (featuring all the files in this GitHub repository plus the dataset folder) is also available here.
+The whole project (featuring all the files in this GitHub repository plus the dataset folder) is also available [here](https://drive.google.com/open?id=1ZIhLUtEeXBAVrjwTi2pyk0dBrG7Ra-rC).
 
 ## Usage
 
@@ -70,7 +71,7 @@ The project has the following structure:
 * **B2ResNet.py** : Trains, validates and tests a pre-trained ResNet model with raw pixels as input
 
 **Datasets** (folder) : Contains data pre-processing files and original dataset
-* **dataset** (folder) : Folder downloaded from [here](https://drive.google.com/open?id=1LOivxHk_6kZ8LpOWvdqo4DZzAIfF1cVP), where all the data used in the project is.
+* **dataset** (folder) : Folder downloadable from [here](https://drive.google.com/open?id=1LOivxHk_6kZ8LpOWvdqo4DZzAIfF1cVP), where all the data used in the project is.
 * **dataA1.py** : Pre-processes and augments data for each model implemented for Task A1
 * **dataA2.py** : Pre-processes and augments data for each model implemented for Task A2
 * **dataB1.py** : Pre-processes and augments data for each model implemented for Task B1

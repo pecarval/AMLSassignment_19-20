@@ -58,7 +58,7 @@ acc3_B1_test = model3_B1.test(testdataB1_CNN['test'])
 acc3_B1_addtest = model3_B1.test(testdataB1_CNN['addtest'])
 
 # Clean up memory
-del model3_B1, dataB1_CNN, testdataB1_CNN, dataset_sizess
+del model3_B1, dataB1_CNN, testdataB1_CNN, dataset_sizes
 
 '''
 acc3_B1_train = 'TBD'

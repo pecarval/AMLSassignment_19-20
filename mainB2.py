@@ -26,6 +26,7 @@ del model1_B2
 '''
 acc1_B2_train = 'TBD'
 acc1_B2_test = 'TBD'
+acc1_B2_addtest = 'TBD'
 '''
 
 # ======================================================================================================================
@@ -42,11 +43,12 @@ del model2_B2, dataB2_CNN, testdataB2_CNN, dataset_sizes
 '''
 acc2_B2_train = 'TBD'
 acc2_B2_test = 'TBD'
+acc2_B2_addtest = 'TBD'
 '''
 
 # ======================================================================================================================
 ## Printing results
 
-print('TB2_1:{},{};TB2_2:{},{};'.format(acc1_B2_train, acc1_B2_test,
-                                        acc2_B2_train, acc2_B2_test))
+print('TB2_1:{},{},{};TB2_2:{},{},{};'.format(acc1_B2_train, acc1_B2_test, acc1_B2_addtest,
+                                        acc2_B2_train, acc2_B2_test, acc2_B2_addtest))
 
