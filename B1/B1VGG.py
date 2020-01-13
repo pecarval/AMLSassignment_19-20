@@ -25,7 +25,7 @@ class B1:
         # Importing & Changing pre-trained VGG model
         self.model = models.vgg16(pretrained=True)
         classifier_input = self.model.classifier[6].in_features
-        self.model.classifier[6] = nn.Linear(classifier_input, 2)
+        self.model.classifier[6] = nn.Linear(classifier_input, 5)
 
         # Defining loss function as Cross Entropy Loss
         self.criterion = nn.CrossEntropyLoss()
