@@ -1,9 +1,7 @@
+import os, sys
 import numpy as np
-from scipy import ndarray
-import skimage as sk
-from skimage import util
-from skimage import transform
-import cv2, dlib, os, random, sys
+import cv2
+import dlib
 
 stderr = sys.stderr
 sys.stderr = open(os.devnull, 'w')
@@ -14,12 +12,12 @@ from keras.preprocessing import image
 
 # PATH TO ALL IMAGES
 global basedir, image_paths, target_size
-basedir = './Datasets/dataset/A/'
-images_dir = os.path.join(basedir,'img')
+#basedir = './Datasets/dataset/A/'
+#images_dir = os.path.join(basedir,'img')
 labels_filename = 'labels.csv'
 
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor('./Datasets/dataset/shape_predictor_68_face_landmarks.dat')
+#predictor = dlib.shape_predictor('./Datasets/dataset/shape_predictor_68_face_landmarks.dat')
 
 # how to find frontal human faces in an image using 68 landmarks.  
 # These are points on the face such as the corners of the mouth, along the eyebrows, on the eyes, and so forth.
@@ -61,7 +59,7 @@ def rect_to_bb(rect):
     return (x, y, w, h)
 
 
-def run_dlib_shape(image):
+def run_dlib_shape(image, predictor):
     # in this function we load the image, detect the landmarks of the face, and then return the image and the landmarks
     # load the input image, resize it, and convert it to grayscale
     resized_image = image.astype('uint8')
@@ -98,90 +96,46 @@ def run_dlib_shape(image):
 
     return dlibout, resized_image
 
-def extract_features_labels():
+def extract_features_labels(dire):
     """
     This funtion extracts the landmarks features for all images in the folder 'dataset/celeba'.
-    It also extracts the gender label for each image.
+    It also extracts the emotion label for each image.
+
+    Keyword arguments:
+        dire (str) : Directory for features to be extracted from
+
     :return:
         landmark_features:  an array containing 68 landmark points for each image in which a face was detected
-        gender_labels:      an array containing the gender label (male=0 and female=1) for each image in
+        emotion_labels:      an array containing the gender label (male=0 and female=1) for each image in
                             which a face was detected
     """
+    
+    predictor = dlib.shape_predictor(dire+'shape_predictor_68_face_landmarks.dat')
+    basedir = dire
+    images_dir = os.path.join(basedir,'img')
     image_paths = [os.path.join(images_dir, l) for l in os.listdir(images_dir)]
 
     target_size = None
     labels_file = open(os.path.join(basedir, labels_filename), 'r')
     lines = labels_file.readlines()
-    gender_labels = {line.split(',')[0] : int(line.split(',')[2]) for line in lines[1:]}
+    emotion_labels = {line.split(',')[0] : int(line.split(',')[3]) for line in lines[1:]}
     if os.path.isdir(images_dir):
         all_features = []
         all_labels = []
         for img_path in image_paths:
-            file_name= img_path.split('.')[1].split('/')[-1]
+            file_name = img_path.split('.')[1].split('/')[-1] if basedir[:2] != '..' else img_path.split('.')[2].split('/')[-1]
 
             # load image
             img = image.img_to_array(
                 image.load_img(img_path,
                                target_size=target_size,
                                interpolation='bicubic'))
-            #img = data_augmentation(img)
-            features, _ = run_dlib_shape(img)
+            features, _ = run_dlib_shape(img, predictor)
             if features is not None:
                 all_features.append(features)
-                all_labels.append(gender_labels[file_name])
+                all_labels.append(emotion_labels[file_name])
 
     landmark_features = np.array(all_features)
-    gender_labels = (np.array(all_labels) + 1)/2 # simply converts the -1 into 0, so male=0 and female=1
-    return landmark_features, gender_labels
+    emotion_labels = (np.array(all_labels) + 1)/2 # simply converts the -1 into 0, so smile=0 and nosmile=1
+    return landmark_features, emotion_labels
 
-'''
-Data Augmentation part of Landmarks Computation
-
-Not used in final version as the facial landmarks feature failed
-to recognize faces in images that have been flipped or rotated 
-(More information in Section 4.1 of Report)
-'''
-
-def data_augmentation(img):
-    '''
-    Randomly chooses to apply a transformation (or not)
-    to the image before the facial landmarks are computed
-    '''
-    
-    if (random.choice([0,1]) == 1):
-        return transform_img(img)
-    else:
-        return img
-
-
-def transform_img(image):
-    '''
-    Applies 3 transformations to an image
-    '''
-    
-    img = random_rotation(image)
-    img = horizontal_flip(image)
-    return vertical_flip(img)
-
-
-def random_rotation(image_array):
-    '''
-    Apply a random rotation between -15 or 15 degrees to the image
-    '''
-
-    degree = random.uniform(-15, 15)
-    return sk.transform.rotate(image_array, degree)
-
-
-def horizontal_flip(image_array):
-    '''
-    Horizontally flip an image using array indexing
-    '''
-    return image_array[:, ::-1]
-
-
-def vertical_flip(image_array):
-    '''
-    Vertically flip an image using array indexing
-    '''
-    return image_array[::-1, :]
