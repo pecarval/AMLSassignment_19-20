@@ -47,8 +47,8 @@ class B2:
         and loss at each epoch of training
 
         Keyword arguments:
-            - dataloader : torch DataLoader with train, val and test datasets
-            - sizes : Array of 2 elements with size of train and val datasets
+            - dataloader : torch DataLoader with train and validation datasets
+            - sizes : Array of 2 elements with size of train and validation datasets
 
         Returns:
             - best_train_acc : Training accuracy of the best epoch in %
@@ -68,7 +68,7 @@ class B2:
         Test the CNN model on previously unseen data
 
         Keyword arguments:
-            - dataloader : torch DataLoader with train, val and test datasets
+            - dataloader : torch DataLoader with dataset to be tested
 
         Returns:
             - test_acc : Testing accuracy of the model in %

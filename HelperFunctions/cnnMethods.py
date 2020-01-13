@@ -11,6 +11,13 @@ from torch.optim import lr_scheduler, SGD
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils, datasets, models
 
+'''
+CNN training and testing methods are adapted from:
+
+"Transfer Learning for Computer Vision Tutorial — PyTorch Tutorials 1.3.1 documentation", 
+Pytorch.org, 2020. [Online]. Available: https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html. 
+[Accessed: 13- Jan- 2020].
+'''
 
 def train_cnn(model, dataloader, sizes, num_epochs, criterion, optimizer, scheduler):
     '''
@@ -34,7 +41,7 @@ def train_cnn(model, dataloader, sizes, num_epochs, criterion, optimizer, schedu
     '''
 
     best_model_wts = copy.deepcopy(model.state_dict())
-    best_acc = 0.0
+    best_val_acc = 0.0
     prev_acc = 0.0
 
     # Initializing arrays to keep track of loss 
@@ -48,7 +55,6 @@ def train_cnn(model, dataloader, sizes, num_epochs, criterion, optimizer, schedu
 
     train_on_gpu = torch.cuda.is_available()
     if train_on_gpu:
-        print('using gpu')
         model.cuda()
 
     for epoch in range(num_epochs):
@@ -86,8 +92,6 @@ def train_cnn(model, dataloader, sizes, num_epochs, criterion, optimizer, schedu
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
-            if phase == 'train':
-                scheduler.step()
 
             # Computing loss and accuracy at the epoch
             epoch_loss = running_loss / sizes[phase]
@@ -96,12 +100,13 @@ def train_cnn(model, dataloader, sizes, num_epochs, criterion, optimizer, schedu
             accs[phase][epoch] = epoch_acc
 
             if phase == 'train':
+                scheduler.step()
                 prev_acc = epoch_acc
 
             # Save the best mmodel so far
-            if phase == 'val' and epoch_acc > best_acc:
+            if phase == 'val' and epoch_acc > best_val_acc:
                 best_train_acc = prev_acc
-                best_acc = epoch_acc
+                best_val_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
 
     # Load best model weights as the model
